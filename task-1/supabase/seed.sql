@@ -20,11 +20,12 @@ CREATE TABLE public.activity_categories (
   name TEXT NOT NULL
 );
 
--- Surrogate id + FKs; "date" stored as timestamptz (datetime)
+-- Surrogate id + FKs; "date" stored as timestamptz (datetime); "title" is user-visible activity line
 CREATE TABLE public.activities (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   user_id BIGINT NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
   category_id BIGINT NOT NULL REFERENCES public.activity_categories (id) ON DELETE RESTRICT,
+  title TEXT NOT NULL,
   date TIMESTAMPTZ NOT NULL,
   points INTEGER NOT NULL
 );

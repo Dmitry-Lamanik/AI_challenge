@@ -96,6 +96,11 @@ const LAST_NAMES = [
 
 const POSITIONS = [
   'Software Engineer',
+  'Software Engineer',
+  'Software Engineer',
+  'Software Engineer',
+  'Software Engineer',
+  'Software Engineer',
   'Designer',
   'Marketing Manager',
   'Product Manager',
@@ -105,11 +110,14 @@ const POSITIONS = [
   'Legal Manager',
   'Senior Designer',
   'Senior Software Engineer',
+  'Senior Software Engineer',
+  'Senior Software Engineer',
   'Senior Product Manager',
   'Senior Sales Manager',
   'Senior Customer Support Manager',
   'Senior HR Manager',
-  'Lead Software Engineer'
+  'Lead Software Engineer',
+  'Lead Software Engineer',
 ]
 
 /** Fixed category names required by the seed spec */
@@ -146,6 +154,45 @@ function randomTimestamptz() {
   return new Date(now - offsetMs).toISOString()
 }
 
+const ACTIVITY_TITLE_TEMPLATES = [
+  '[REG] Peer review workshop',
+  '[EXT] Conference dry run',
+  '[INT] Internal guild presentation',
+  '[INT] QA handbook update',
+  '[REG] Testing bootcamp session',
+  '[EXT] Customer training webinar',
+  '[INT] Release retrospective notes',
+  '[REG] Accessibility audit walkthrough',
+  '[EXT] Innovation day booth',
+  '[REG] Cross-team knowledge share',
+  '[REG] Technical interview',
+  '[EDU] PHP News Digest',
+  '[EDU] Advanced SQL workshop',
+  '[EDU] Git best practices',
+  '[EDU] Docker deep dive',
+  '[EDU] Kubernetes fundamentals',
+  '[EDU] React performance optimization',
+  '[EDU] Node.js architecture',
+  '[EDU] Python machine learning',
+  '[EDU] Go programming',
+  '[EDU] AI tools for developers',
+  '[EDU] Cybersecurity essentials',
+  '[EDU] Cloud computing fundamentals',
+  '[EDU] DevOps automation',
+  '[EDU] Data visualization',
+  '[EDU] Project management',
+  '[EDU] Leadership skills',
+  '[EDU] Communication techniques',
+  '[EDU] Time management',
+]
+
+function randomActivityTitle() {
+  if (Math.random() < 0.2) {
+    return '[LAB] Mentoring of {name}'.replace('{name}', randomPersonName())
+  }
+  return pick(ACTIVITY_TITLE_TEMPLATES)
+}
+
 const sql = readFileSync(sqlPath, 'utf8')
 const client = new pg.Client({ connectionString })
 
@@ -156,12 +203,15 @@ try {
   await client.query(sql)
 
   const categoryIds = []
+  const categoryIdByName = {}
   for (const name of ACTIVITY_CATEGORY_NAMES) {
     const { rows } = await client.query(
       'INSERT INTO public.activity_categories (name) VALUES ($1) RETURNING id',
       [name],
     )
-    categoryIds.push(Number(rows[0].id))
+    const id = Number(rows[0].id)
+    categoryIds.push(id)
+    categoryIdByName[name] = id
   }
 
   const userIds = []
@@ -177,12 +227,16 @@ try {
   for (const userId of userIds) {
     const activitiesForUser = randomInt(1, 20)
     for (let a = 0; a < activitiesForUser; a++) {
-      const categoryId = pick(categoryIds)
       const date = randomTimestamptz()
       const points = randomInt(1, 100)
+      const title = randomActivityTitle()
+      let categoryId = pick(categoryIds)
+      if (title.startsWith('[LAB] Mentoring of')) {
+        categoryId = categoryIdByName['Education']
+      }
       await client.query(
-        'INSERT INTO public.activities (user_id, category_id, date, points) VALUES ($1, $2, $3::timestamptz, $4)',
-        [userId, categoryId, date, points],
+        'INSERT INTO public.activities (user_id, category_id, title, date, points) VALUES ($1, $2, $3, $4::timestamptz, $5)',
+        [userId, categoryId, title, date, points],
       )
       activityCount++
     }

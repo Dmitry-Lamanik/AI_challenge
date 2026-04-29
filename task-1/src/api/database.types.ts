@@ -3,7 +3,7 @@
  */
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       users: {
@@ -40,12 +40,14 @@ export interface Database {
           id: number
           user_id: number
           category_id: number
+          title: string
           date: string
           points: number
         }
         Insert: {
           user_id: number
           category_id: number
+          title: string
           date: string
           points: number
         }
@@ -53,6 +55,7 @@ export interface Database {
           id?: number
           user_id?: number
           category_id?: number
+          title?: string
           date?: string
           points?: number
         }
