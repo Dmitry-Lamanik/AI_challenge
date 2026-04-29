@@ -1,3 +1,10 @@
+.db-status {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted-foreground, #64748b);
+  max-width: 36rem;
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

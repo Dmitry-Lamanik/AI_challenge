@@ -1,11 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
+import { isSupabaseConfigured, supabase } from './lib/supabaseClient'
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [dbStatus, setDbStatus] = useState<string>(() =>
+    isSupabaseConfigured()
+      ? 'Checking database…'
+      : 'Configure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env',
+  )
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return
+    let cancelled = false
+    void (async () => {
+      const { error, count } = await supabase
+        .from('users')
+        .select('*', { count: 'exact', head: true })
+      if (cancelled) return
+      if (error) setDbStatus(`Supabase: ${error.message}`)
+      else setDbStatus(`Supabase OK — users count: ${count ?? 0}`)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <>
@@ -20,6 +42,7 @@ function App() {
           <p>
             Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
           </p>
+          <p className="db-status">{dbStatus}</p>
         </div>
         <button
           type="button"
