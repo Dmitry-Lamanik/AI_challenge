@@ -1,11 +1,19 @@
+import { useMemo } from 'react'
 import { useUsersWithActivities } from '../hooks/useUsersWithActivities'
 import { isSupabaseConfigured } from '../api/supabaseClient'
+import { sortUsersByPointsDesc } from '../utils/rosterLeaderboard'
 import { UserCard } from './UserCard'
+import { WinnersPodium } from './WinnersPodium'
 import './Users.css'
 
 export function Users() {
   const configured = isSupabaseConfigured()
   const { data: users, isPending, isError, error, refetch } = useUsersWithActivities()
+
+  const ranked = useMemo(
+    () => (users?.length ? sortUsersByPointsDesc(users) : []),
+    [users],
+  )
 
   if (!configured) {
     return (
@@ -42,10 +50,17 @@ export function Users() {
     )
   }
 
+  const first = ranked[0]
+  const second = ranked[1]
+  const third = ranked[2]
+
   return (
     <section className="users" aria-label="Users list">
+      {first ? (
+        <WinnersPodium first={first} second={second} third={third} />
+      ) : null}
       <ul className="users__list">
-        {users.map((user, index) => (
+        {ranked.map((user, index) => (
           <UserCard key={user.id} user={user} rank={index + 1} />
         ))}
       </ul>
