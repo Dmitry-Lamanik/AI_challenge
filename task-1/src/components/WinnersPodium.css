@@ -1,0 +1,301 @@
+/* Matches `.user-card` stats star/value (`--uc-highlight`) */
+/* Avatar scale: list `.user-card__avatar` (48px; 46px ≤720px); 2nd/3rd +15% vs list; 1st +30% vs 2nd/3rd */
+.winners-podium {
+  --list-avatar: 48px;
+  --wp-podium-23: calc(var(--list-avatar) * 135 / 100);
+  --wp-podium-1: calc(var(--wp-podium-23) * 140 / 100);
+  --wp-stats-highlight: #0ea5e9;
+  width: 100%;
+  margin-bottom: 2rem;
+  padding: 0 0 0.5rem;
+  box-sizing: border-box;
+}
+
+.winners-podium__heading {
+  margin: 0 0 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-family: var(--heading);
+  color: var(--text-h);
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.winners-podium__grid {
+  display: grid;
+  align-items: end;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.winners-podium__grid--single {
+  grid-template-columns: 1fr;
+  max-width: 260px;
+  justify-items: center;
+}
+
+.winners-podium__grid--two {
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+  max-width: 520px;
+}
+
+.winners-podium__grid--triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.winners-podium__slot {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.winners-podium__column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.winners-podium__upper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+  width: 100%;
+}
+
+.winners-podium__avatar-wrap {
+  position: relative;
+  margin-bottom: 0.25rem;
+}
+
+.winners-podium__avatar {
+  width: var(--wp-podium-23);
+  height: var(--wp-podium-23);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: calc(var(--wp-podium-23) * 0.31);
+  color: #fff;
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+  box-sizing: border-box;
+}
+
+.winners-podium__avatar-wrap--gold .winners-podium__avatar {
+  width: var(--wp-podium-1);
+  height: var(--wp-podium-1);
+  font-size: calc(var(--wp-podium-1) * 0.31);
+  border: 4px solid #eab308;
+  background: linear-gradient(145deg, #2563eb, #1e40af);
+}
+
+.winners-podium__avatar-wrap--silver .winners-podium__avatar,
+.winners-podium__avatar-wrap--bronze .winners-podium__avatar {
+  border: 2px solid #ffffff;
+}
+
+.winners-podium__badge {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #fff;
+  border: 2px solid var(--bg);
+  box-sizing: border-box;
+}
+
+.winners-podium__badge--gold {
+  background: #ca8a04;
+}
+
+.winners-podium__badge--silver {
+  background: #94a3b8;
+}
+
+.winners-podium__badge--bronze {
+  background: #b45309;
+}
+
+.winners-podium__name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: var(--heading);
+  color: var(--text-h);
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.winners-podium__position {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.winners-podium__score {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.winners-podium__score--gold {
+  background: #fef9c3;
+  color: #c2410c;
+  border: 1px solid #fde047;
+}
+
+.winners-podium__score--gold .winners-podium__star {
+  color: #ea580c;
+}
+
+.winners-podium__score--silver,
+.winners-podium__score--bronze {
+  background: var(--bg);
+  color: var(--wp-stats-highlight);
+  border: 1px solid color-mix(in srgb, var(--wp-stats-highlight) 38%, var(--border));
+}
+
+.winners-podium__score--silver .winners-podium__star,
+.winners-podium__score--bronze .winners-podium__star {
+  color: var(--wp-stats-highlight);
+}
+
+.winners-podium__score-value {
+  line-height: 1;
+}
+
+.winners-podium__block {
+  width: 100%;
+  border-radius: 14px 14px 0 0;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.winners-podium__block--1 {
+  min-height: 132px;
+  background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.winners-podium__block--2,
+.winners-podium__block--3 {
+  background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
+}
+
+.winners-podium__block--2 {
+  min-height: 110px;
+}
+
+.winners-podium__block--3 {
+  min-height: 16px;
+}
+
+.winners-podium__block-num {
+  font-size: clamp(3rem, 12vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.45);
+  user-select: none;
+  pointer-events: none;
+}
+
+.winners-podium__block--1 .winners-podium__block-num {
+  color: rgba(234, 179, 8, 0.35);
+}
+
+.winners-podium__block--2 .winners-podium__block-num,
+.winners-podium__block--3 .winners-podium__block-num {
+  color: rgba(148, 163, 184, 0.55);
+}
+
+.winners-podium__column--1 .winners-podium__upper {
+  margin-bottom: 0.85rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .winners-podium {
+    --wp-stats-highlight: #0ea5e9;
+  }
+
+  .winners-podium__avatar-wrap--silver .winners-podium__avatar,
+  .winners-podium__avatar-wrap--bronze .winners-podium__avatar {
+    border-color: rgba(255, 255, 255, 0.85);
+  }
+
+  .winners-podium__badge {
+    border-color: var(--bg);
+  }
+
+  .winners-podium__score--silver,
+  .winners-podium__score--bronze {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: color-mix(in srgb, var(--wp-stats-highlight) 42%, transparent);
+    color: var(--wp-stats-highlight);
+  }
+
+  .winners-podium__score--silver .winners-podium__star,
+  .winners-podium__score--bronze .winners-podium__star {
+    color: var(--wp-stats-highlight);
+  }
+
+  .winners-podium__score--gold {
+    background: rgba(234, 179, 8, 0.2);
+    border-color: rgba(250, 204, 21, 0.45);
+    color: #fdba74;
+  }
+
+  .winners-podium__score--gold .winners-podium__star {
+    color: #fb923c;
+  }
+
+  .winners-podium__block--1 {
+    background: linear-gradient(180deg, rgba(234, 179, 8, 0.35) 0%, rgba(202, 138, 4, 0.25) 100%);
+  }
+
+  .winners-podium__block--2,
+  .winners-podium__block--3 {
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.35) 0%, rgba(100, 116, 139, 0.25) 100%);
+  }
+}
+
+@media (max-width: 540px) {
+  .winners-podium__grid--two,
+  .winners-podium__grid--triple {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    max-width: 280px;
+  }
+
+  .winners-podium__grid--triple .winners-podium__slot--1 {
+    order: -1;
+  }
+}
+
+@media (max-width: 720px) {
+  .winners-podium {
+    --list-avatar: 46px;
+  }
+}

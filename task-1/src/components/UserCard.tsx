@@ -4,14 +4,11 @@ import { useUpdateUserName } from '../hooks/useUpdateUserName'
 import type { UserWithActivities } from '../types/roster'
 import { UserActivity } from './UserActivity'
 import { USER_NAME_EDIT_LABELS, USER_NAME_EDIT_MESSAGES } from './userNameEdit.constants'
+import { initialsFromName, totalPoints } from '../utils/rosterLeaderboard'
 import './UserCard.css'
 
 /** Display order for known categories (matches common roster layout). */
 const CATEGORY_METRIC_ORDER = ['Public Speaking', 'Education', 'University Partnership'] as const
-
-function totalPoints(user: UserWithActivities): number {
-  return user.activities.reduce((sum, a) => sum + a.points, 0)
-}
 
 function activityCountsByCategory(user: UserWithActivities): Map<string, number> {
   const map = new Map<string, number>()
@@ -36,19 +33,6 @@ function categoryMetricsWithCounts(user: UserWithActivities): { name: string; co
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([name, count]) => ({ name, count }))
   return [...ordered, ...extras]
-}
-
-function initialsFromName(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean)
-  if (parts.length >= 2) {
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase()
-  }
-  if (parts.length === 1) {
-    const w = parts[0]
-    if (w.length >= 2) return w.slice(0, 2).toUpperCase()
-    if (w.length === 1) return w.toUpperCase()
-  }
-  return '?'
 }
 
 function GraduationCapIcon({ className }: { className?: string }) {
