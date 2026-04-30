@@ -1,5 +1,10 @@
 import { supabase } from './supabaseClient'
-import type { ActivityWithCategory, UserWithActivities } from '../types/roster'
+import type {
+  ActivityWithCategory,
+  UpdateUserNameInput,
+  UpdateUserNameResult,
+  UserWithActivities,
+} from '../types/roster'
 
 function sortActivitiesNewestFirst(rows: ActivityWithCategory[]): ActivityWithCategory[] {
   return [...rows].sort((a, b) => {
@@ -52,4 +57,41 @@ export async function fetchUsersWithActivities(): Promise<UserWithActivities[]> 
   }
 
   return normalizeUsers(data)
+}
+
+export class UserNameConflictError extends Error {
+  constructor() {
+    super('User name has been modified by another session.')
+    this.name = 'UserNameConflictError'
+  }
+}
+
+export function isUserNameConflictError(error: unknown): error is UserNameConflictError {
+  return error instanceof UserNameConflictError
+}
+
+export async function updateUserName({
+  userId,
+  nextName,
+  expectedCurrentName,
+}: UpdateUserNameInput): Promise<UpdateUserNameResult> {
+  const trimmedName = nextName.trim()
+
+  const { data, error } = await supabase
+    .from('users')
+    .update({ name: trimmedName } as never)
+    .eq('id', userId)
+    .eq('name', expectedCurrentName)
+    .select('id, name, position')
+    .limit(1)
+
+  if (error) {
+    throw error
+  }
+
+  if (!data?.length) {
+    throw new UserNameConflictError()
+  }
+
+  return data[0]
 }

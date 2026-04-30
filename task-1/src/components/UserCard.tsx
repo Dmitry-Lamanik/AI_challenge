@@ -1,6 +1,9 @@
 import { useId, useMemo, useState } from 'react'
+import { isUserNameConflictError } from '../api/roster'
+import { useUpdateUserName } from '../hooks/useUpdateUserName'
 import type { UserWithActivities } from '../types/roster'
 import { UserActivity } from './UserActivity'
+import { USER_NAME_EDIT_LABELS, USER_NAME_EDIT_MESSAGES } from './userNameEdit.constants'
 import './UserCard.css'
 
 /** Display order for known categories (matches common roster layout). */
@@ -176,10 +179,78 @@ export type UserCardProps = {
 export function UserCard({ user, rank }: UserCardProps) {
   const panelId = useId()
   const [expanded, setExpanded] = useState(false)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [initialName, setInitialName] = useState(user.name)
+  const [draftName, setDraftName] = useState(user.name)
+  const [editError, setEditError] = useState<string | null>(null)
+  const { mutateAsync: updateName, isPending: isSavingName } = useUpdateUserName()
   const points = totalPoints(user)
   const activityCount = user.activities.length
 
   const categoryMetrics = useMemo(() => categoryMetricsWithCounts(user), [user])
+  const trimmedDraftName = draftName.trim()
+
+  function openNameEditor() {
+    if (isSavingName) return
+    setInitialName(user.name)
+    setDraftName(user.name)
+    setEditError(null)
+    setIsEditingName(true)
+  }
+
+  function cancelNameEditing() {
+    setDraftName(initialName)
+    setEditError(null)
+    setIsEditingName(false)
+  }
+
+  async function saveNameEdit() {
+    if (isSavingName) return
+
+    if (!trimmedDraftName) {
+      setEditError(USER_NAME_EDIT_MESSAGES.empty)
+      return
+    }
+
+    if (trimmedDraftName === initialName.trim()) {
+      cancelNameEditing()
+      return
+    }
+
+    try {
+      await updateName({
+        userId: user.id,
+        nextName: trimmedDraftName,
+        expectedCurrentName: initialName,
+      })
+      setEditError(null)
+      setIsEditingName(false)
+    } catch (error) {
+      if (isUserNameConflictError(error)) {
+        setEditError(USER_NAME_EDIT_MESSAGES.conflict)
+        return
+      }
+
+      setEditError(USER_NAME_EDIT_MESSAGES.generic)
+    }
+  }
+
+  function handleNameInputChange(value: string) {
+    setDraftName(value)
+    if (editError && value.trim()) {
+      setEditError(null)
+    }
+  }
+
+  function handleToggleActivities() {
+    setExpanded((prev) => {
+      const next = !prev
+      if (!next && isEditingName) {
+        cancelNameEditing()
+      }
+      return next
+    })
+  }
 
   return (
     <li className={`user-card${expanded ? ' user-card--expanded' : ''}`}>
@@ -194,7 +265,59 @@ export function UserCard({ user, rank }: UserCardProps) {
           </div>
 
           <div className="user-card__identity">
-            <h2 className="user-card__name">{user.name}</h2>
+            {isEditingName ? (
+              <div className="user-card__name-edit" role="group" aria-label="User name edit form">
+                <label className="user-card__name-label" htmlFor={`name-input-${panelId}`}>
+                  {USER_NAME_EDIT_LABELS.input}
+                </label>
+                <input
+                  id={`name-input-${panelId}`}
+                  className="user-card__name-input"
+                  value={draftName}
+                  onChange={(event) => handleNameInputChange(event.target.value)}
+                  disabled={isSavingName}
+                  aria-invalid={editError === USER_NAME_EDIT_MESSAGES.empty}
+                />
+                <div className="user-card__name-actions">
+                  <button
+                    type="button"
+                    className="user-card__name-save"
+                    onClick={() => void saveNameEdit()}
+                    disabled={isSavingName}
+                  >
+                    {isSavingName ? 'Saving...' : USER_NAME_EDIT_LABELS.saveAction}
+                  </button>
+                  <button
+                    type="button"
+                    className="user-card__name-cancel"
+                    onClick={cancelNameEditing}
+                    disabled={isSavingName}
+                  >
+                    {USER_NAME_EDIT_LABELS.cancelAction}
+                  </button>
+                </div>
+                {editError ? (
+                  <p
+                    className="user-card__name-error"
+                    role={editError === USER_NAME_EDIT_MESSAGES.conflict ? 'alert' : 'status'}
+                  >
+                    {editError}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <div className="user-card__name-row">
+                <h2 className="user-card__name">{user.name}</h2>
+                <button
+                  type="button"
+                  className="user-card__name-edit-trigger"
+                  onClick={openNameEditor}
+                  aria-label={USER_NAME_EDIT_LABELS.editAction}
+                >
+                  Edit
+                </button>
+              </div>
+            )}
             <p className="user-card__position">{user.position}</p>
           </div>
         </div>
@@ -228,7 +351,7 @@ export function UserCard({ user, rank }: UserCardProps) {
           aria-expanded={expanded}
           aria-controls={panelId}
           aria-label={expanded ? 'Hide activities' : 'Show activities'}
-          onClick={() => setExpanded((v) => !v)}
+          onClick={handleToggleActivities}
         >
           <ChevronIcon className="user-card__chevron" />
         </button>

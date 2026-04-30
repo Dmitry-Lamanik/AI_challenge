@@ -18,3 +18,11 @@ export type UserWithActivities = {
   position: string
   activities: ActivityWithCategory[]
 }
+
+export type UpdateUserNameInput = {
+  userId: number
+  nextName: string
+  expectedCurrentName: string
+}
+
+export type UpdateUserNameResult = Pick<UserWithActivities, 'id' | 'name' | 'position'>
