@@ -1,19 +1,23 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useUsersWithActivities } from '../hooks/useUsersWithActivities'
 import { isSupabaseConfigured } from '../api/supabaseClient'
 import { sortUsersByPointsDesc } from '../utils/rosterLeaderboard'
+import { applyRosterHeaderFilters, defaultHeaderFilterState } from '../utils/rosterFilters'
+import type { HeaderFilterState } from '../types/roster'
 import { UserCard } from './UserCard'
+import { UsersFilterBar } from './UsersFilterBar'
 import { WinnersPodium } from './WinnersPodium'
 import './Users.css'
 
 export function Users() {
   const configured = isSupabaseConfigured()
   const { data: users, isPending, isError, error, refetch } = useUsersWithActivities()
+  const [filters, setFilters] = useState<HeaderFilterState>(defaultHeaderFilterState)
 
-  const ranked = useMemo(
-    () => (users?.length ? sortUsersByPointsDesc(users) : []),
-    [users],
-  )
+  const ranked = useMemo(() => {
+    if (!users?.length) return []
+    return sortUsersByPointsDesc(applyRosterHeaderFilters(users, filters))
+  }, [users, filters])
 
   if (!configured) {
     return (
@@ -56,14 +60,24 @@ export function Users() {
 
   return (
     <section className="users" aria-label="Users list">
-      {first ? (
-        <WinnersPodium first={first} second={second} third={third} />
-      ) : null}
-      <ul className="users__list">
-        {ranked.map((user, index) => (
-          <UserCard key={user.id} user={user} rank={index + 1} />
-        ))}
-      </ul>
+      <UsersFilterBar filters={filters} onFiltersChange={setFilters} />
+
+      {ranked.length === 0 ? (
+        <p className="users__no-matches" role="status">
+          No users match the current filters.
+        </p>
+      ) : (
+        <>
+          {first ? (
+            <WinnersPodium first={first} second={second} third={third} />
+          ) : null}
+          <ul className="users__list">
+            {ranked.map((user, index) => (
+              <UserCard key={user.id} user={user} rank={index + 1} />
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   )
 }

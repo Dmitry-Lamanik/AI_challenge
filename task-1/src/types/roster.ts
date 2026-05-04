@@ -26,3 +26,18 @@ export type UpdateUserNameInput = {
 }
 
 export type UpdateUserNameResult = Pick<UserWithActivities, 'id' | 'name' | 'position'>
+
+/** Header roster filters (see `specs/003-header-activity-filters/data-model.md`). */
+
+export type HeaderFilterYear = 'all' | '2025'
+
+export type HeaderFilterQuarter = 'all' | 'Q1' | 'Q2' | 'Q3' | 'Q4'
+
+export type HeaderFilterCategory = 'all' | 'Education' | 'Public speaking' | 'University partner'
+
+export type HeaderFilterState = {
+  year: HeaderFilterYear
+  quarter: HeaderFilterQuarter
+  category: HeaderFilterCategory
+  searchRaw: string
+}

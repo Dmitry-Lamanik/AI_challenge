@@ -6,6 +6,15 @@
   box-sizing: border-box;
 }
 
+.users__no-matches {
+  margin: 1rem 0 0;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
 .users--loading,
 .users--empty,
 .users--error {
