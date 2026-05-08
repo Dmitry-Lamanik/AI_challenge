@@ -292,14 +292,14 @@ export function UserCard({ user, rank }: UserCardProps) {
             ) : (
               <div className="user-card__name-row">
                 <h2 className="user-card__name">{user.name}</h2>
-                <button
+                {/* <button
                   type="button"
                   className="user-card__name-edit-trigger"
                   onClick={openNameEditor}
                   aria-label={USER_NAME_EDIT_LABELS.editAction}
                 >
                   Edit
-                </button>
+                </button> */}
               </div>
             )}
             <p className="user-card__position">{user.position}</p>
