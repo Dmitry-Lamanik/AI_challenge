@@ -1,0 +1,5 @@
+# Default owners for all files
+* @ai-challenge/app-team
+
+# UI components
+/src/components/ @ai-challenge/frontend-team
